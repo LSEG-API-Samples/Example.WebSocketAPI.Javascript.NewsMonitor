@@ -17,12 +17,13 @@
 {
     // Main application module.  This application depends on the Angular 'ngAnimate' module.
     // As the name implies, 'ngAnimate' provides animation using CSS styles which allows visual 
-    // feedback when a field is updated in realtime.
+    // feedback when the status of the service is updated.
     var app = angular.module('NewsWidget',['ngAnimate']);
     
     // Configuration
     app.constant('config', {
-        wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
+        //wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
+        wsServer: '10.67.4.99:15000',
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
@@ -37,14 +38,6 @@
     // ****************************************************************
     // Custom filters used when displaying data in our widget
     // ****************************************************************
-    
-    // substr
-    // Enable the manipulation of strings using the native substr() functionality.
-    app.filter('substr', function() {
-        return( function(input, start, len) {
-            if ( input ) return(input.substr(start,len));
-        });
-    });
     
     // trArr2Str
     // Walks through the array and formats the string elements, space separated.
@@ -244,7 +237,7 @@
         {
             if ( this.selectedFilter.trim() != this.filter ) {
                 this.filter = this.selectedFilter;
-                if (this.filter.trim()) {
+                if (this.filter) {
                     this.filteredStories = this.allStories.filter(story => {                    
                         for (var i = 0; i < story.rics.length; i++)
                             if (this.filter === story.rics[i]) return true;
