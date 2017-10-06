@@ -1,0 +1,214 @@
+<html ng-app="NewsWidget">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>News Widget</title>
+    <meta name="author" content="Nick Zincone"></>
+
+    <!-- Publicly available styles -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+
+    <!-- Publicly available Javascript libraries -->
+    <script type="text/javascript" src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/angular-animate.min.js"></script>
+    
+    <!-- Elektron WebSocket interface -->
+    <script type="text/javascript" src="TRWebSocketController/TRWebSocketController.js"></script>
+    <script type="text/javascript" src="TRWebSocketController/zlib.js"></script>
+    
+    <!-- Application-specific javascript interface and logic -->
+    <script type="text/javascript" src="newsObject.js"></script>
+
+    <style>
+        /* Some convenient color class used in our display */
+        .wlabel {
+            color: #66ffff;
+            text-align: right;
+        }
+        .color-green {
+            color: lime;
+        }        
+        .color-red {
+          color: #ff3333;
+        }        
+        .color-orange {
+          color: orange;
+        }        
+        
+        .vertical-align {
+            display: flex;
+            align-items: center;
+        }
+
+        input{margin-top:15px; height:25px;}
+
+        /* Animation 
+           Coupled with the animate-on-change directive within our Javascript, define how the highlight is displayed upon change */
+
+        [animate-on-change] {
+          transition: all 1s;
+          -webkit-transition: all 1s;
+        }
+        
+        /* Our market data items will hilite in the specified color */
+        .change.ng-enter {
+            color: yellow;
+        }
+
+        /* Our status bar messages will hilite in the specified color */
+        .status.ng-enter {
+            color: orange;
+        } 
+
+        /* Some visual feedback when were in our input RIC field */
+        .ng-invalid.ng-dirty {
+            border-color: #FA787E;
+        }        
+        .ng-valid.ng-dirty {
+            border-color: #78FA89;
+        }
+        
+        /* 10px gutter
+             Our Bootstrap grid uses a default spacing between columns of 15px on either side.  Referred to as the gutter,
+             we can override that default here. */
+        .gutter-10.row {
+            margin-right: -5px;
+            margin-left: -5px;
+        }        
+        .gutter-10 > [class^="col-"], .gutter-10 > [class^=" col-"] {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+/*Set a min width where your table start to look like crap*/
+table { min-width: 600px; }
+
+/*The next 3 sections make the magic happen*/
+thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+tbody {
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Use the following to make sure cols align correctly*/
+table, tr, th, td {
+    padding: 0px 0px 0px 0px;
+    font-family:Arial,Verdana,sans-serif;
+    font-size:1em;
+    color:white;
+    
+    border-collapse: collapse;
+}
+
+/* header */
+.table > thead > tr > th {
+   border-bottom: none;
+}
+/* rows */
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+   border-top: none;
+    border-bottom: 1px solid black;   
+}  
+
+tr:hover td {
+    background-color: #464744;
+}
+
+.story {
+    display: block;
+
+    font-family: monospace;
+    white-space: pre;
+    color: yellow;
+    overflow-y: auto;
+}
+
+    
+    </style>
+
+</head>
+
+<body ng-controller="widgetController as news">
+    <div class="page-header">
+        <h3>Elektron Websocket API - News Widget</h3>
+    </div>
+    
+<div class="container" style="width:1200px;height:680px; background:#303030;">
+    <div class="row vertical-align" style="background:#202020;height: 30px;">
+        <div class="col-xs-2" style="font-size:24px; color:orange;">News Filter</div>
+        <div class="col-xs-10">
+            <form ng-submit="news.requestFilter()" novalidate>
+                <input ng-disabled="news.needsConfiguration" type="text" ng-model="news.selectedFilter" 
+                       size="12" style="color:white;background:black" placeholder="Eg: TRI.N">
+                </input>
+            </form>
+        </div>
+    </div>  
+    
+    <div ng-show=news.needsConfiguration>
+        Before using this widget, the following configuration is required within the 'newsObject.js' file.
+        Modify the following sections:
+        <pre style="font-size:10px;color:yellow;background-color:#303030; border:none">
+app.constant('config', {
+wsServer: '&lt;host:port&gt;',   // Address of our Eikon WebSocket server.  Eg: ads:15000
+...
+
+wsService: 'ELEKTRON_EDGE',   // Elektron WebSocket service hosting realtime market data 
+...       </pre>
+    </div>
+
+    <div ng-hide=news.needsConfiguration>
+        <div class="row" style="background:#303030;height:360px">
+            <div class="col-xs-12" >
+                <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th class="col-xs-1">Time</th>
+                        <th class="col-xs-2">RICs</th>
+                        <th class="col-xs-9">Headline</th>
+                      </tr>
+                    </thead>  
+                    <tbody style="max-height:300px">
+                        <tr ng-repeat="story in news.stories">
+                            <td class="col-xs-1">{{story.date | date : "hh:mm:ss a"}}</td>
+                            <td class="col-xs-2">{{story.rics | trArr2Str}}</td>
+                            <td class="col-xs-9"><a href="" ng-click="news.selectStory(story)" style="color:yellow">{{story.headline}}</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>                  
+    </div>      
+    
+    <div class="table" style="width:1200px">
+        <pre style="background:#303030; height:250px; color:white">{{news.selectedStoryText()}}</pre>
+    </div>
+
+    <div class="row" style="background:#303030;">
+        <div class="col-xs-1 wlabel">Status: </div>    
+        <div class="col-xs-11" style="color:#F9E79F;">
+            <select class="status" animate-on-change="statusList[0]" style="width:100%; background-color:black" onchange="this.selectedIndex = 0;" 
+                    ng-model="statusList[0]" ng-options="status.msg for status in statusList"></select>
+        </div>
+    </div>        
+   
+    
+</div>
+
+ 
+    
+    
+ 
+
+</body>
+</html>
