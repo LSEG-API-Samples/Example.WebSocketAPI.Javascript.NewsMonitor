@@ -194,7 +194,6 @@
             if (this.newsController.loggedIn())
                 this.newsController.requestNewsStory(config.wsService);
         }; 
-
         
         //********************************************************************************************
         // TRWebSocketController.onNewsStory
@@ -208,8 +207,8 @@
             // Filter out the "R:" include our list of RICs as part of this story - used for filtering
             story.rics = subjects.map(ric => ric.substr(2));
             
-            // Retrieve date in a ready-made format to be used within the Angular date filter
-            story.date = new Date(story.versionCreated);
+            // Convert the Story Date into a JS Date field - necessary to be used within the Angular date filter
+            story.date = new Date(story.firstCreated);
             
             // Store the new story
             self.allStories.unshift(story);
