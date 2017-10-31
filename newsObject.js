@@ -8,7 +8,7 @@
 //
 // Author:  Nick Zincone
 // Version: 1.0
-// Date:    October 2017.
+// Date:    November 2017.
 // ********************************************************************************************************
 
 // App
@@ -22,36 +22,36 @@
     
     // Configuration
     app.constant('config', {
-        //wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
-        wsServer: '10.67.4.99:15000',
+        wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
-            position: '127.0.0.1',
-            id: 500                     // Request ID - used to easily identify login response
+            position: '127.0.0.1'
         },
         wsService: 'ELEKTRON_EDGE',     // Elektron WebSocket service hosting realtime market data
-        wsStreamingID: 10,              // All MarketPrice streaming requests use the same ID.
-        streaming: true                 // We should always be streaming, but for testing we can change
     });
     
     // ****************************************************************
     // Custom filters used when displaying data in our widget
     // ****************************************************************
     
-    // trArr2Str
-    // Walks through the array and formats the string elements, space separated.
-    app.filter('trArr2Str', function() {
-        return( function(ricArray) {
-            if (ricArray && ricArray.length > 0) {
-                var result = "";
-                for (var i = 0; i < ricArray.length; i++)
-                    result = result + ricArray[i] + " "; 
+    // ricList
+    // Extract the RICs from the subject array and format as a simple list of rics, space separated.
+    app.filter('ricList', function() {
+        return( function(rics) {
+            // Filter out the "R:" portion for each entry
+            var result = rics.map(ric => ric.substr(2));
+			
+            if (result.length > 0) {
+                var list = "";
+                for (var i = 0; i < result.length; i++)
+                    list = list + result[i] + " "; 
                 
-                return(result);
+                return(list);
             }
+			return("");
         });
-    });    
+    });
 
     //******************************************************************************************
     // Sharable Services
@@ -113,12 +113,9 @@
         
         // *****************************************************************
         // For simplicity, we capture all the MRN stories, in memory,  as 
-        // they stream to us.  The following properties keep track of these
-        // stories, depending on the current view of interest.
+        // they stream to us.
         // *****************************************************************
-        this.allStories = [];               // In-memory news stories
-        this.filteredStories = null;        // Filtered stories
-        this.stories = this.allStories;     // Stories in our current view
+        this.stories = [];               // Our data model.  Collection of ews stories.
         
         // Our Elektron WebSocket interface
         this.newsController = new TRWebSocketController();
@@ -192,62 +189,23 @@
             widgetStatus.update("Login state: " + msg.State.Stream + "/" + msg.State.Data + "/" + msg.State.Text);
 
             if (this.newsController.loggedIn())
-                this.newsController.requestNewsStory(config.wsService);
+                this.newsController.requestNews(config.wsService);
         }; 
         
         //********************************************************************************************
-        // TRWebSocketController.onNewsStory
+        // TRWebSocketController.onNews
         // Capture all news stories generated from MRN.  All stories presented here are complete and
-        // decompressed.  The goal here is to capture each story for presentation.
+        // decompressed.  We simply store each story within our data model.
         //********************************************************************************************        
-        this.newsController.onNewsStory(function(story) {
-            // Before capturing our story, search the subjects for RICs - anything that begins with "R:"
-            var subjects = story.subjects.filter(subject => subject.search("R:") >= 0);
-            
-            // Filter out the "R:" include our list of RICs as part of this story - used for filtering
-            story.rics = subjects.map(ric => ric.substr(2));
-            
-            // Convert the Story Date into a JS Date field - necessary to be used within the Angular date filter
-            story.date = new Date(story.firstCreated);
-            
-            // Store the new story
-            self.allStories.unshift(story);
-            
-            // Check to see if we applied a filter to the current view.  If so, check if story should be included
-            if ( self.filteredStories ) {
-                var found = false;
-                for (var i=0; i < story.rics.length; i++)
-                    if ( story.rics[i] === self.filter )  found = true;
-                        
-                if ( found )
-                    self.filteredStories.unshift(story);
-            }
-            
-            // Propagate all model changes into the view
-            $scope.$apply();  
-        });
-
-        //*******************************************************************************
-        // requestFilter
-        // Based on user input from our widget UI, request that current headlines are 
-        // filtered based on the user selection.
-        //*******************************************************************************
-        this.requestFilter = function()
-        {
-            if ( this.selectedFilter.trim() != this.filter ) {
-                this.filter = this.selectedFilter;
-                if (this.filter) {
-                    this.filteredStories = this.allStories.filter(story => {                    
-                        for (var i = 0; i < story.rics.length; i++)
-                            if (this.filter === story.rics[i]) return true;
-                        return false;                
-                    });
-                    this.stories = this.filteredStories;
-                } else {
-                    this.filteredStories = null;
-                    this.stories = this.allStories;
-                }                
-            }
-        }       
+        this.newsController.onNews(function(ric, story) {
+			$scope.$apply( function() {
+				// Store the new story
+				self.stories.unshift(story);
+				
+				// Simple trim to keep the stories in memory manageable
+				if ( self.stories.length > 1000 )
+					self.stories.pop();
+			});
+        });      
     });
 })();

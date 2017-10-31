@@ -125,20 +125,18 @@
     <div class="row vertical-align" style="background:#202020;height: 30px;">
         <div class="col-xs-2" style="font-size:24px; color:orange;">News Filter</div>
         <div class="col-xs-10">
-            <form ng-submit="news.requestFilter()" novalidate>
-                <input ng-disabled="news.needsConfiguration" type="text" ng-model="news.selectedFilter" 
-                       size="12" style="color:white;background:black" placeholder="Eg: TRI.N">
-                </input>
-            </form>
+			<input ng-disabled="news.needsConfiguration" type="text" ng-model="news.selectedFilter" 
+				   size="12" style="color:white;background:black" placeholder="Eg: TRI.N">
+			</input>
         </div>
     </div>  
     
-    <div style="height:360px" ng-show=news.needsConfiguration>
+    <div style="height:360px; color:white" ng-show=news.needsConfiguration>
         Before using this widget, the following configuration is required within the 'newsObject.js' file.
         Modify the following sections:
         <pre style="font-size:12px;color:yellow;background-color:#303030; border:none">
 app.constant('config', {
-   wsServer: '&lt;host:port&gt;',   // Address of our Eikon WebSocket server.  Eg: ads:15000
+   wsServer: '&lt;host:port&gt;',   // Address of our Elektron WebSocket server.  Eg: ads:15000
    ...
 
    wsService: 'ELEKTRON_EDGE',   // Elektron WebSocket service hosting realtime market data 
@@ -158,10 +156,11 @@ app.constant('config', {
                       </tr>
                     </thead>  
                     <tbody style="max-height:300px">
-                        <tr ng-repeat="story in news.stories">
-                            <td class="col-xs-1">{{story.date | date : "hh:mm:ss a"}}</td>
-                            <td class="col-xs-2">{{story.rics | trArr2Str}}</td>
-                            <td class="col-xs-9"><a href="" ng-click="news.selectStory(story)" style="color:yellow">{{story.headline}}</a></td>
+						<!-- Note: For each attribute below, we are doing an Angular one-time binding (::) to prevent unecessary filters processing -->
+                        <tr ng-repeat="story in news.stories | filter:{subjects:(news.selectedFilter.length==0?'':'R:'+news.selectedFilter)}">
+                            <td class="col-xs-1">{{::story.firstCreated | date : "hh:mm:ss a"}}</td>
+                            <td class="col-xs-2">{{::story.subjects | filter:"R:" | ricList}}</td>
+                            <td class="col-xs-9"><a href="" ng-click="news.selectStory(story)" style="color:yellow">{{::story.headline}}</a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -170,7 +169,7 @@ app.constant('config', {
     </div>      
     
     <div class="table" style="width:1200px">
-        <pre style="background:#303030; height:250px; color:white">{{news.selectedStoryText()}}</pre>
+        <pre style="background:#303030; height:250px; color:mintcream">{{news.selectedStoryText()}}</pre>
     </div>
 
     <div class="row" style="background:#303030;">
@@ -179,15 +178,7 @@ app.constant('config', {
             <select class="status" animate-on-change="statusList[0]" style="width:100%; background-color:black" onchange="this.selectedIndex = 0;" 
                     ng-model="statusList[0]" ng-options="status.msg for status in statusList"></select>
         </div>
-    </div>        
-   
-    
+    </div> 
 </div>
-
- 
-    
-    
- 
-
 </body>
 </html>
