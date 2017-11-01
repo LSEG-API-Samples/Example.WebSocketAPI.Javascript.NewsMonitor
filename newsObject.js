@@ -41,7 +41,7 @@
         return( function(rics) {
             // Filter out the "R:" portion for each entry
             var result = rics.map(ric => ric.substr(2));
-			
+            
             if (result.length > 0) {
                 var list = "";
                 for (var i = 0; i < result.length; i++)
@@ -49,7 +49,7 @@
                 
                 return(list);
             }
-			return("");
+            return("");
         });
     });
 
@@ -198,14 +198,14 @@
         // decompressed.  We simply store each story within our data model.
         //********************************************************************************************        
         this.newsController.onNews(function(ric, story) {
-			$scope.$apply( function() {
-				// Store the new story
-				self.stories.unshift(story);
-				
-				// Simple trim to keep the stories in memory manageable
-				if ( self.stories.length > 1000 )
-					self.stories.pop();
-			});
+            $scope.$apply( function() {
+                // Store the new story
+                self.stories.unshift(story);
+                
+                // Simple trim to keep the stories in memory manageable
+                if ( self.stories.length > 1000 )
+                    self.stories.pop();
+            });
         });      
     });
 })();
