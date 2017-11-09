@@ -189,7 +189,7 @@
             widgetStatus.update("Login state: " + msg.State.Stream + "/" + msg.State.Data + "/" + msg.State.Text);
 
             if (this.newsController.loggedIn())
-                this.newsController.requestNews(config.wsService);
+                this.newsController.requestNews("MRN_STORY", config.wsService);
         }; 
         
         //********************************************************************************************
