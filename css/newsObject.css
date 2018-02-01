@@ -1,0 +1,109 @@
+/* Some convenient color class used in our display */
+.wlabel {
+    color: #66ffff;
+    text-align: right;
+}
+.color-green {
+    color: lime;
+}
+.color-red {
+  color: #ff3333;
+}
+.color-orange {
+  color: orange;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+/* Input
+   Control looks of input search box */
+
+input[type=text] {
+  color:white;
+  background:#404040;
+  border:none;
+  height:29px;
+}
+
+.form-control {
+  padding-right: 30px;
+}
+
+.form-control + .glyphicon {
+  position: absolute;
+  right: 0;
+  padding: 8px 27px;
+}
+
+/* Animation
+   Coupled with the animate-on-change directive within our Javascript, define how the highlight is displayed upon change */
+
+[animate-on-change] {
+  transition: all 1s;
+  -webkit-transition: all 1s;
+}
+
+/* Our market data items will hilite in the specified color */
+.change.ng-enter {
+    color: yellow;
+}
+
+/* Our status bar messages will hilite in the specified color */
+.status.ng-enter {
+    color: orange;
+}
+
+/* Some visual feedback when were in our input RIC field */
+.ng-invalid.ng-dirty {
+    border-color: #FA787E;
+}
+.ng-valid.ng-dirty {
+    border-color: #78FA89;
+}
+
+/* 10px gutter
+     Our Bootstrap grid uses a default spacing between columns of 15px on either side.  Referred to as the gutter,
+     we can override that default here. */
+.gutter-10.row {
+    margin-right: -5px;
+    margin-left: -5px;
+}
+.gutter-10 > [class^="col-"], .gutter-10 > [class^=" col-"] {
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+tbody {
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Use the following to make sure cols align correctly*/
+table, tr, th, td {
+    padding: 0px 0px 0px 0px;
+    font-family:Arial,Verdana,sans-serif;
+    font-size:1em;
+    color:white;
+
+    border-collapse: collapse;
+}
+
+/* rows */
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+   border-top: none;
+    border-bottom: 1px solid black;
+}
+
+tr:hover td {
+    background-color: #464744;
+}

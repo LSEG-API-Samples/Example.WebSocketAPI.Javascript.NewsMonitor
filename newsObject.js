@@ -23,13 +23,13 @@
     // Configuration
     app.constant('config', {
         //wsServer: '<host:port>',        // Address of our Elektron WebSocket server.  Eg: ads:15000
-        wsServer:'ewa:15000',
+        wsServer: 'ewa:15000',
         wsLogin: {                      // Elektron WebSocket login credentials
             user: 'user',
             appId: '256',
             position: '127.0.0.1'
         },
-        //wsService: 'ELEKTRON_EDGE',     // Elektron WebSocket service hosting realtime market data
+        //wsService: 'ELEKTRON_EDGE',     // Optional. Elektron WebSocket service hosting realtime news
     });
 
     // ****************************************************************
