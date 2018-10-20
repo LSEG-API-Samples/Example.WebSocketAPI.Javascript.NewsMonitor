@@ -14,8 +14,9 @@
     <script type="text/javascript" src="js/angular-animate.min.js"></script>
 
     <!-- Elektron WebSocket interface -->
-    <script type="text/javascript" src="TRWebSocketController/TRWebSocketController.js"></script>
-    <script type="text/javascript" src="TRWebSocketController/zlib.js"></script>
+    <script type="text/javascript" src="ERTController/ERTWebSocketController.js"></script>
+    <script type="text/javascript" src="ERTController/ERTRESTController.js"></script>   
+    <script type="text/javascript" src="ERTController/zlib.js"></script>
 
     <!-- Application-specific javascript interface and logic -->
     <script type="text/javascript" src="newsObject.js"></script>
@@ -25,7 +26,7 @@
 <body ng-controller="widgetController as news">
 
 <div class="page-header">
-    <h3>Elektron Websocket API - News Widget</h3>
+    <h3>EDP/ERT API - News Widget</h3>
 </div>
 
 <div class="container" style="width:1200px;height:680px; background:#303030;">
@@ -41,12 +42,16 @@
 
     <div style="height:360px; color:white" ng-show=news.needsConfiguration>
         Before using this widget, the following configuration is required within the 'newsObject.js' file.
-        Modify the following section:
+        Define the session and authentication properties within the following section:
         <pre style="font-size:12px;color:yellow;background-color:#303030; border:none">
-app.constant('config', {
-   wsServer: '&lt;host:port&gt;',   // Address of our Elektron WebSocket server.  Eg: ads:15000
-   ...
-}       </pre>
+// Application session configuration
+// Define the session (TREP, EDP/ERT) you wish to use to access streaming services.  To define your session,
+// Uncomment the line below:
+//      session: undefined
+//
+// Eg:  session: 'EDP'     // EDP/ERT Session
+//      session: 'ADS'     // TREP/ADS Session
+        </pre>
     </div>
 
     <div ng-hide=news.needsConfiguration>
