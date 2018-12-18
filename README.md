@@ -20,7 +20,7 @@ For any question related to this article please use the Developer Community [Q&A
 ***Note:** To be able to ask questions and to benefit from the full content available on the [Developer Community portal](https://developers.thomsonreuters.com) we recommend you to [register here]( https://developers.thomsonreuters.com/iam/register) or [login here]( https://developers.thomsonreuters.com/iam/login?destination_path=Lw%3D%3D).*
 
 ## <a id="disclaimer"></a>Disclaimer
-The source code presented in this project has been written by Refinitiv only for the purpose of illustrating the concepts of building a simple real-time news monitor.  It has not been tested for a usage in production environments.
+TheÂ source code presented in this project has been written by Refinitiv only for the purpose of illustrating the concepts of building a simple real-time news monitor.  It has not been tested for a usage in production environments.
 
 ## <a id="prerequisites"></a>Prerequisites
 
@@ -95,9 +95,7 @@ adsSession: {
       user: 'user',              // User name.  Optional.  Default: desktop login.
       appId: '256',              // AppID. Optional.  Default: '256'
       position: '127.0.0.1',     // Position.  Optional. Default: '127.0.0.1'         
-   }
-   //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting 
-                                   // realtime market data              
+   }             
 },
 ```
 
@@ -145,9 +143,7 @@ To setup your environment to access ERT in the cloud, perform the following step
            user: undefined,
            password: undefined,
            clientId: undefined
-       },
-       //wsService: 'ELEKTRON_EDGE',   // Optional. Elektron WebSocket service hosting
-                                       // realtime market data 
+       } 
    ```
 
 4. Load the widget within the browser using the following URL format:
