@@ -1,5 +1,5 @@
 
-# News Monitor with Real-time Translated Headlines 
+# Real-time News monitor
 ## Table of Content
 
 * [Overview](#overview)
@@ -9,28 +9,27 @@
 * [Running the monitor](#monitor)
 
 ## <a id="overview"></a>Overview
-The Real-time news widget is a lightweight web-based interface utilizing capabilities offered within the Elektron RealTime (ERT) streaming services to deliver real-time news headlines and stories to the browser.  Using popular web technologies such as Angular JS and Twitter Bootstrap, the widget displays a simple news monitor displaying real-time news headlines and stories.  The latest version also includes optional functionality for machine translating real-time news headlines. It uses Google's commercial API for the machine translation but any one of a number of different machine translation vendors could easily be substituted.
+The Real-time news widget is a lightweight web-based interface utilizing capabilities offered within the Elektron RealTime (ERT) streaming services to deliver real-time news headlines and stories to the browser.  Using popular web technologies such as Angular JS and Twitter Bootstrap, the widget displays a simple news monitor displaying real-time news headlines and stories.
 
-Details and concepts are shown in the [Real-time News Monitor using Refinitiv Elektron](https://developers.refinitiv.com/content/creating-real-time-news-monitor-app-mrn-and-elektron-websocket-api) video within the Developer Community portal.
+Details and concepts are shown in the [Real-time News Monitor using Thomson Reuters Elektron](https://developers.thomsonreuters.com/content/creating-real-time-news-monitor-app-mrn-and-elektron-websocket-api) video within the Developer Community portal.
 
 ![image](images/news.gif)
 
-For any question related to this article please use the Developer Community [Q&A Forum](https://community.developers.refinitiv.com).
+For any question related to this article please use the Developer Community [Q&A Forum](https://community.developers.thomsonreuters.com).
 
-***Note:** To be able to ask questions and to benefit from the full content available on the [Developer Community portal](https://community.developers.refinitiv.com) we recommend you to [register here]( https://developers.thomsonreuters.com/iam/register) or [login here]( https://developers.thomsonreuters.com/iam/login?destination_path=Lw%3D%3D).*
+***Note:** To be able to ask questions and to benefit from the full content available on the [Developer Community portal](https://developers.thomsonreuters.com) we recommend you to [register here]( https://developers.thomsonreuters.com/iam/register) or [login here]( https://developers.thomsonreuters.com/iam/login?destination_path=Lw%3D%3D).*
 
 ## <a id="disclaimer"></a>Disclaimer
-The source code presented in this project has been written by Refinitiv only for the purpose of illustrating the concepts of building a simple real-time news monitor with automatically translated headlines.  This code is **not suitable for production environments** (in particular APIs are accessed from the client side). 
+The source code presented in this project has been written by Refinitiv only for the purpose of illustrating the concepts of building a simple real-time news monitor.  It has not been tested for a usage in production environments.
 
 ## <a id="prerequisites"></a>Prerequisites
 
-Software components and APIs used:
+Software components used:
 
 * [Elektron WebSocket API](https://developers.thomsonreuters.com/elektron/websocket-api-early-access) - interface to access Elektron real-time market data.
 * [Angular JS](https://angularjs.org/) (v1.6.5)- Googles Client-side JavaScript framework to build rich HTML applications.  Not only provides an easy and intuitive capability to binding our content within our pages but also animated visual feedback of real-time updates.
 * [Bootstrap](http://getbootstrap.com/css/) (v3.3.7) - CSS templates providing useful styles for our display.
 * Access to ERT streaming services.
-* [Google Translate API](https://cloud.google.com/translate/) Dynamically translate between languages using Google’s pre-trained or custom machine learning models based on your content needs. 
 
 Browser support: 
 
@@ -41,8 +40,6 @@ Browser support:
 The package includes the complete source code and necessary dependencies to execute.  You can contact your local Market Data team or Refinitiv representative to provide the necessary setup to connect and test.  Because the package includes the [ERTController](https://github.com/TR-API-Samples/Example.ERT.Javascript.ERTController) submodule, you will need to properly clone using:
 
 `git clone --recursive <URL of this package>`
-
-If you want to use the machine translation functionality you will also need an API key from Google to use their API, which they charge for. [Google Translation API](https://cloud.google.com/translate/docs/quickstarts)
 
 The application package includes the following:
 
@@ -120,7 +117,21 @@ To setup your environment to access ERT in the cloud, perform the following step
 
    This will create a local directory called node_modules/ containing the modules to run a local HTTP server.
 
-2. Configure your access within your specific example.  Refer to the section of code that requires the authentication details:
+2. Start your server
+
+   ```
+   $> node server.js
+   ```
+
+   This will start a local HTTP server running on port 8080.
+
+   **Note**: If the machine is behind a proxy server, you need to configure Node.js to use a proxy instead of a direct HTTP connection via the following command in a command prompt:
+
+   ```
+   set https_proxy=http://<proxy.server>:<port>
+   ```
+
+3. Configure your access within your specific example.  Refer to the section of code that requires the authentication details:
 
    ```javascript
    // ERT (Elektron Real Time) in Cloud session.
@@ -135,35 +146,13 @@ To setup your environment to access ERT in the cloud, perform the following step
        } 
    ```
 
-3. Configure your API access key for the Google Translation API.  Line 130 of newsObject.js:
+4. Load the widget within the browser using the following URL format:
 
    ```
-        // Enter an API key from the Google API Console:
-        //   https://console.developers.google.com/apis/credentials
-        const apiKey = "enter key here";
+   http://localhost:8080/quoteObject.html
    ```
 
-4. Start your server
-
-   ```
-   $> node server.js
-   ```
-
-   This will start a local HTTP server running on port 8080.
-
-   **Note**: If the machine is behind a proxy server, you need to configure Node.js to use a proxy instead of a direct HTTP connection via the following command in a command prompt:
-
-   ```
-   set https_proxy=http://<proxy.server>:<port>
-   ```
-
-5. Load the widget within the browser using the following URL format:
-
-   ```
-   http://localhost:8080/newsObject.html
-   ```
-
-### Refinitiv Workspace (future)
+### Eikon (future)
 
 ### <a id="contributing"></a>Contributing
 
@@ -171,9 +160,8 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ### <a id="authors"></a>Authors
 
-* **Nick Zincone**   - Release 1.0.  *Initial version* (TREP connectivity only)
-* **Nick Zincone**   - Release 2.0.  Added connectivity into EDP/ERT in the cloud.
-* **James Sullivan** - Release 3.0.  Added machine translation of streaming headlines.
+* **Nick Zincone** - Release 1.0.  *Initial version* (TREP connectivity only)
+* **Nick Zincone** - Release 2.0.  Added connectivity into EDP/ERT in the cloud.
 
 ### <a id="license"></a>License
 

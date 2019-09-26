@@ -22,13 +22,12 @@
 // App
 // Main Application entry point.  Perform app-specific intialization within our closure
 (function()
-{ 
+{
     // Main application module.  This application depends on the Angular 'ngAnimate' module.
     // As the name implies, 'ngAnimate' provides animation using CSS styles which allows visual
     // feedback when the status of the service is updated.
     var app = angular.module('NewsWidget',['ngAnimate']);
     
-
     // Application session configuration
     // Define the session (TREP, EDP/ERT) you wish to use to access streaming services.  To define your session,
     // update the following setting:
@@ -37,7 +36,7 @@
     // Eg:  session: 'EDP'     // EDP/ERT Session
     //      session: 'ADS'     // TREP/ADS Session
     app.constant('config', {
-        session: 'EDP',         // 'ADS' or 'EDP'.
+        session: undefined,         // 'ADS' or 'EDP'.
         
         // TREP (ADS) session.
         // This section defines the connection and authentication requirements to connect directly into the 
@@ -58,8 +57,8 @@
         // Start the local HTTP server (provided) and within your browser, specify the URL: http://localhost:8080/quoteObject.html
         edpSession: {
             wsLogin: {
-                user: '',
-                password: '',
+                user: undefined,
+                password: undefined,
                 clientId: undefined
             },
             restAuthHostName: 'https://api.edp.thomsonreuters.com/auth/oauth2/beta1/token',
@@ -93,7 +92,6 @@
         });
     });
 
-
     //******************************************************************************************
     // Sharable Services
     //
@@ -119,39 +117,6 @@
         });
     });
 
-
-        //***********************************
-        // Translation code 
-        // added by James Sullivan 2019/09/19
-        //***********************************
-         
-        // Enter an API key from the Google API Console:
-        //   https://console.developers.google.com/apis/credentials
-        const apiKey = "";
-
-        var storyTranslationObj = {
-            sourceLang: 'en',
-            targetLang: 'ja',
-            textToTranslate: 'This is a news story.',
-            format: "text"
-        };
-
-        var headlineTranslationObj = {
-            sourceLang: 'en',
-            targetLang: 'ja',
-            textToTranslate: 'This is a news headline.',
-            format: "text"
-        };
-
-        function translationURL(data) {
-            var url = "https://www.googleapis.com/language/translate/v2/" +
-            "?key=" + apiKey +
-            "&q=" + encodeURI(data.textToTranslate) +
-            "&target=" + data.targetLang +
-            "&source=" + data.sourceLang +
-            "&format=" + data.format;
-            return url
-        }
     //**********************************************************************************************
     // User-defined Directives
     //
@@ -176,7 +141,6 @@
         this.filter = "";
         this.selectedFilter = "";
         this.selectedStory = null;
-        this.selectedLanguage = ""
         this.needsConfiguration = (config.session === undefined);
 
         // *****************************************************************
@@ -210,47 +174,14 @@
         }
 
         this.selectStory = function(story) {
-            if(story != null && story.body.length > 0 && 
-                !(this.selectedLanguage == '' || apiKey == '' || story.language == this.selectedLanguage)){
-                storyTranslationObj.textToTranslate = story.body.replace('\r\n', '<br>');
-                storyTranslationObj.targetLang = this.selectedLanguage;
-                storyTranslationObj.sourceLang = story.language;   
-                this.makeStoryTranslationRequest(storyTranslationObj, story)
-            }
             this.selectedStory = story;
         }
 
-        this.makeStoryTranslationRequest = function(data, mySelectedStory) {
-            var obj = {key: apiKey, source: data.sourceLang, target: data.targetLang, q: data.textToTranslate.replace(/\n/gm, '(yyyyyy)'), format: data.format}
-            let json = JSON.stringify(obj);
-            var s = new XMLHttpRequest(); 
-            s.open("POST", "https://www.googleapis.com/language/translate/v2?key=" + apiKey, true);
-            //Send the proper header information along with the request
-            s.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-            s.setRequestHeader("Accept", "application/json");
-            s.onloadend = function() {
-                if (s.status == 200) {
-                  var translation = JSON.parse(s.responseText).data.translations[0].translatedText;
-                  // Google translate destroys line breaks so ugly hacks are necessary
-                  mySelectedStory.translatedBody = translation.replace(/[(（]yyyyyy[)）]/gm, '\r\n').replace(/<br>/gm, '\r\n');
-                } else {
-                  console.log("story translation error " + this.status);
-                }
-              }
-            s.send(json);
-        }
-
         this.selectedStoryText = function() {
-            var translation = ''
-            if(this.selectedStory != null && this.selectedStory.body.length > 0 && 
-                (this.selectedLanguage == '' || apiKey == '' || this.selectedStory.language == this.selectedLanguage)){
+            if (this.selectedStory != null && this.selectedStory.body.length > 0 )
                 return(this.selectedStory.body)
-            } else if (this.selectedStory != null && this.selectedStory.body.length > 0 && this.selectedStory.hasOwnProperty('translatedBody')) {
-                return(this.selectedStory.translatedBody)
-            } else {
-                return("No story available");
-            } 
-            
+
+            return("No story available");
         }
         
         //***********************************************************************************
@@ -359,11 +290,6 @@
             }
         };
 
-
-
-        
-        
-        
         //********************************************************************************************
         // TRWebSocketController.onNews
         // Capture all news stories generated from MRN.  All stories presented here are complete and
@@ -371,46 +297,13 @@
         //********************************************************************************************
         this.ertController.onNews( (ric, story) => {
             $scope.$apply( () => {
+                // Store the new story
+                this.stories.unshift(story);
 
-            // Abstract API request function
-            function makeHeadlineTranslationRequest(data, storiesPointer) {
-                var url = translationURL(data)
-                var r = new XMLHttpRequest(); 
-                r.open("GET", url, true);
-                //Send the proper header information along with the request
-                r.setRequestHeader("Content-Type", "application/json");
-                r.setRequestHeader("Accept", "application/json");
-
-                r.onreadystatechange = function () {
-                if (r.readyState != 4 || r.status != 200) return; 
-                    var translation = JSON.parse(r.responseText).data.translations[0].translatedText;
-                    story.translatedHeadline = translation;
-                    storiesPointer.unshift(story);
-                };
-                return r.send();
-            }
-
-            // Store the new story
-            if(story.headline.length > 0) {
-                if(this.selectedLanguage == '' || apiKey == '' || story.language == this.selectedLanguage) {
-                    // 'no need to translate'
-                    story.translatedHeadline = story.headline;
-                    this.stories.unshift(story);
-                } else {
-                    // 'translating from ' + story.language + ' to ' + this.selectedLanguage
-                    headlineTranslationObj.textToTranslate = story.headline;
-                    headlineTranslationObj.targetLang = this.selectedLanguage;
-                    headlineTranslationObj.sourceLang = story.language;    
-                    makeHeadlineTranslationRequest(headlineTranslationObj, this.stories);
-                }
-            }
-
-            // Simple trim to keep the stories in memory manageable
-            if ( this.stories.length > 1000 )
-                this.stories.pop();
+                // Simple trim to keep the stories in memory manageable
+                if ( this.stories.length > 1000 )
+                    this.stories.pop();
             });
         });
     });
 })();
-
-
