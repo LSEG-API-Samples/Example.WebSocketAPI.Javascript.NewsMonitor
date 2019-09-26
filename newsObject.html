@@ -2,13 +2,12 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-    <title>Multilanguage News Widget</title>
+    <title>News Widget</title>
     <meta name="author" content="Nick Zincone"></>
 
     <!-- Publicly available styles -->
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="css/newsObject.css" />
-    <script src="http://apis.google.com/js/api.js"></script>
 
     <!-- Publicly available Javascript libraries -->
     <script type="text/javascript" src="js/angular.min.js"></script>
@@ -23,7 +22,13 @@
     <script type="text/javascript" src="newsObject.js"></script>
 
 </head>
+
 <body ng-controller="widgetController as news">
+
+<div class="page-header">
+    <h3>EDP/ERT API - News Widget</h3>
+</div>
+
 <div class="container" style="width:1200px;height:680px; background:#303030;">
     <div class="row vertical-align" style="background:#202020;height: 45px;">
         <!-- <div class="col-xs-2." style="font-size:24px; color:orange;">News Filter:</div> -->
@@ -32,18 +37,6 @@
             <input ng-disabled="news.needsConfiguration" class="form-control" type="text"
                    ng-model="news.selectedFilter" placeholder="Eg: TRI.N"></input>
             <span class="glyphicon glyphicon-search"></span>
-        </div>
-        <label class="col-md-1 control-label" style="width: 12.499999995%; font-size:20px; color:orange;">Language:</label>
-        <div class="col-md-2">
-            <select name="langSelect" ng-model="news.selectedLanguage">
-                <option value="" selected>Original</option>
-                <option value="zh">Chinese</option>
-                <option value="en">English</option>
-                <option value="ja">Japanese</option>
-                <option value="ko">Korean</option>
-                <option value="pt">Portuguese</option>
-                <option value="es">Spanish</option>
-            </select> 
         </div>
     </div>
 
@@ -69,17 +62,15 @@
                       <tr>
                         <th class="col-xs-1">Time</th>
                         <th class="col-xs-2">RICs</th>
-                        <th class="col-xs-2">Original</th>
-                        <th class="col-xs-7">Headline</th>
+                        <th class="col-xs-9">Headline</th>
                       </tr>
                     </thead>
                     <tbody style="max-height:300px">
 						<!-- Note: For each attribute below, we are doing an Angular one-time binding (::) to prevent unecessary filters processing -->
-                        <tr ng-repeat="story in news.stories">
-                            <td class="col-xs-1">{{::story.firstCreated | date : "hh:mm:ss"}}</td>
+                        <tr ng-repeat="story in news.stories | filter:{subjects:(news.selectedFilter.length==0?'':'R:'+news.selectedFilter)}">
+                            <td class="col-xs-1">{{::story.firstCreated | date : "hh:mm:ss a"}}</td>
                             <td class="col-xs-2">{{::story.subjects | filter:"R:" | ricList}}</td>
-			                <td class="col-xs-2">{{::story.language}}</td>
-                            <td class="col-xs-７"><a href="" ng-click="news.selectStory(story)" style="color:yellow">{{::story.translatedHeadline}}</a></td>
+                            <td class="col-xs-9"><a href="" ng-click="news.selectStory(story)" style="color:yellow">{{::story.headline}}</a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -101,4 +92,3 @@
 </div>
 </body>
 </html>
-
