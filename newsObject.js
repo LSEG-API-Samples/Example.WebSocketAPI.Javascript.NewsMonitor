@@ -127,20 +127,20 @@
          
         // Enter an API key from the Google API Console:
         //   https://console.developers.google.com/apis/credentials
-        const apiKey = "";
+        const apiKey = '';
 
         var storyTranslationObj = {
             sourceLang: 'en',
             targetLang: 'ja',
             textToTranslate: 'This is a news story.',
-            format: "text"
+            format: 'text'
         };
 
         var headlineTranslationObj = {
             sourceLang: 'en',
             targetLang: 'ja',
             textToTranslate: 'This is a news headline.',
-            format: "text"
+            format: 'text'
         };
 
         function translationURL(data) {
@@ -152,6 +152,22 @@
             "&format=" + data.format;
             return url
         }
+
+        var noStoryData = new Map ([
+            ['en',  'No story available'],  // default
+            ['ko',  '뉴스 기사가 없습니다'],
+            ['pt',  'Nenhuma notícia disponível'],
+            ['es',  'No hay noticias disponibles'],
+            ['zh',  '没有可用的新闻报导'],
+            ['ja',  '利用可能なニュース記事はありません'],
+        ]);
+
+        var noStory = new Proxy(noStoryData, {
+            get: function(target, id) {
+                return target.has(id) ? target.get(id) : target.get("en");
+            },
+        });
+
     //**********************************************************************************************
     // User-defined Directives
     //
@@ -175,6 +191,7 @@
         $scope.statusList = widgetStatus.list();
         this.filter = "";
         this.selectedFilter = "";
+        this.alreadySelectedStory = null;
         this.selectedStory = null;
         this.selectedLanguage = ""
         this.needsConfiguration = (config.session === undefined);
@@ -209,6 +226,7 @@
                 break;
         }
 
+
         this.selectStory = function(story) {
             if(story != null && story.body.length > 0 && 
                 !(this.selectedLanguage == '' || apiKey == '' || story.language == this.selectedLanguage)){
@@ -218,6 +236,10 @@
                 this.makeStoryTranslationRequest(storyTranslationObj, story)
             }
             this.selectedStory = story;
+        }
+        
+        this.alreadySelectedStory = function(){
+            if(this.selectedStory != null) { this.selectStory(this.selectedStory) } else{null;}
         }
 
         this.makeStoryTranslationRequest = function(data, mySelectedStory) {
@@ -232,7 +254,8 @@
                 if (s.status == 200) {
                   var translation = JSON.parse(s.responseText).data.translations[0].translatedText;
                   // Google translate destroys line breaks so ugly hacks are necessary
-                  mySelectedStory.translatedBody = translation.replace(/[(（]yyyyyy[)）]/gm, '\r\n').replace(/<br>/gm, '\r\n');
+                  mySelectedStory.translatedBody = translation.replace(/[（(（]yyyyyy[)））]/gm, '\r\n').replace(/<br>/gm, '\r\n');
+                  mySelectedStory.translatedLanguage = data.targetLang
                 } else {
                   console.log("story translation error " + this.status);
                 }
@@ -241,16 +264,16 @@
         }
 
         this.selectedStoryText = function() {
-            var translation = ''
             if(this.selectedStory != null && this.selectedStory.body.length > 0 && 
                 (this.selectedLanguage == '' || apiKey == '' || this.selectedStory.language == this.selectedLanguage)){
                 return(this.selectedStory.body)
-            } else if (this.selectedStory != null && this.selectedStory.body.length > 0 && this.selectedStory.hasOwnProperty('translatedBody')) {
+            } else if (this.selectedStory != null && this.selectedStory.body.length > 0 && (this.selectedStory.translatedLanguage == null || this.selectedStory.translatedLanguage != this.selectedLanguage)) {
+                return("....")
+            } else if (this.selectedStory != null && this.selectedStory.body.length > 0 && this.selectedStory.translatedLanguage == this.selectedLanguage) {
                 return(this.selectedStory.translatedBody)
             } else {
-                return("No story available");
+                return(noStory[this.selectedLanguage]);
             } 
-            
         }
         
         //***********************************************************************************
@@ -358,12 +381,7 @@
                 this.ertController.requestNews("MRN_STORY", config.wsService);
             }
         };
-
-
-
-        
-        
-        
+       
         //********************************************************************************************
         // TRWebSocketController.onNews
         // Capture all news stories generated from MRN.  All stories presented here are complete and
