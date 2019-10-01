@@ -254,7 +254,7 @@
                 if (s.status == 200) {
                   var translation = JSON.parse(s.responseText).data.translations[0].translatedText;
                   // Google translate destroys line breaks so ugly hacks are necessary
-                  mySelectedStory.translatedBody = translation.replace(/[（(（]yyyyyy[)））]/gm, '\r\n').replace(/<br>/gm, '\r\n');
+                  mySelectedStory.translatedBody = translation.replace(/[（(（]\s?([yY]{5,9}|[a]{5,9})[)））]/gm, '\r\n').replace(/<br>/gm, '\r\n');
                   mySelectedStory.translatedLanguage = data.targetLang
                 } else {
                   console.log("story translation error " + this.status);
