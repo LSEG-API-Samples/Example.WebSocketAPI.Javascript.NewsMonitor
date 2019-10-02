@@ -1,4 +1,4 @@
-﻿
+
 # ヘッドライン自動翻訳機能付きのニュース モニター 
 ## 目次
 
@@ -40,7 +40,9 @@
 
 パッケージには、完全なソース コードと実行に必要なライブラリなどが含まれています。接続してテストするために必要な設定については、社内のマーケット データ チームまたはリフィニティブの担当者までお問い合わせください。パッケージには [ERTController](https://github.com/TR-API-Samples/Example.ERT.Javascript.ERTController) サブモジュールが含まれているため、以下のコマンドを使用してクローンする必要があります:
 
-`git clone --recursive <URL of this package>`
+`git clone --recursive <URL of this package> ERTController`
+
+Eg: `git clone --recursive https://github.com/Refinitiv-API-Samples/Example.ERT.Javascript.ERTController ERTController`
 
 機械翻訳機能をご利用になりたい場合は Google 提供の有料の API キーが必要です。 (無料および試用のキーはパフォーマンス上の理由により利用できません。)。[Google Translation API](https://cloud.google.com/translate/docs/quickstarts)
 

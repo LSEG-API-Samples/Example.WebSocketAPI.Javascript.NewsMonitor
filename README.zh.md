@@ -40,7 +40,9 @@ Refinitiv 在此提供此项目源代码的唯一目的是用于说明创建简�
 
 本包包含完整的源代码和执行的必要依赖项。如需必要的连接和测试设置帮助，可联系本地的市场数据团队或 Refinitiv 代表。 因为包包含了 [ERTController](https://github.com/TR-API-Samples/Example.ERT.Javascript.ERTController) 子模块，需要使用以下命令适当克隆:
 
-`git clone --recursive <URL of this package>`
+`git clone --recursive <URL of this package> ERTController`
+
+Eg: `git clone --recursive https://github.com/Refinitiv-API-Samples/Example.ERT.Javascript.ERTController ERTController`
 
 还需要 Google 提供的 API 密钥，需要付费。 [Google Translation API](https://cloud.google.com/translate/docs/quickstarts)
 

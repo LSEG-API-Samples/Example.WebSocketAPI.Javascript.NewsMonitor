@@ -40,7 +40,9 @@ Browser support:
 
 The package includes the complete source code and necessary dependencies to execute.  You can contact your local Market Data team or Refinitiv representative to provide the necessary setup to connect and test.  Because the package includes the [ERTController](https://github.com/TR-API-Samples/Example.ERT.Javascript.ERTController) submodule, you will need to properly clone using:
 
-`git clone --recursive <URL of this package>`
+`git clone --recursive <URL of this package> ERTController`
+
+Eg: `git clone --recursive https://github.com/Refinitiv-API-Samples/Example.ERT.Javascript.ERTController ERTController`
 
 If you want to use the machine translation functionality you will also need a paid for API key (free and trial keys are too slow to use) from Google. [Google Translation API](https://cloud.google.com/translate/docs/quickstarts)
 
