@@ -7,9 +7,9 @@ const web_path = path.join(__dirname, './');
 const app = express();
 const port = 8080;
 
-// EDP constant variables
-const auth_hostname = 'https://api.edp.thomsonreuters.com';
-const EDP_version = '/beta1';
+// RDP constant variables
+const auth_hostname = 'https://api.refinitiv.com';
+const RDP_version = '/v1';
 const auth_category_URL = '/auth/oauth2';
 const auth_endpoint_URL = '/token';
 const client_secret = '';
@@ -17,7 +17,7 @@ const streaming_category_URL = '/streaming/pricing';
 const streaming_category_version = '/v1/';
 
 var hostname_service_endpoint = auth_hostname + streaming_category_URL + streaming_category_version;
-var edp_gateway_token_url = auth_hostname + auth_category_URL + EDP_version + auth_endpoint_URL;
+var rdp_gateway_token_url = auth_hostname + auth_category_URL + RDP_version + auth_endpoint_URL;
 
 app.use(express.static(web_path));
 app.use(bodyParser.json()); // for parsing application/json
@@ -36,7 +36,7 @@ app.get("/quoteObjectERT.html", function (req, res) {
 //[Modify By Wasin W.]
 //
 // "/requesttoken" HTTP Post
-// handle "/requesttoken" HTTP Post from ERTRESTController.js. The function redirects posted data to EDP Authentication server via get_Access_Token() function
+// handle "/requesttoken" HTTP Post from ERTRESTController.js. The function redirects posted data to RDP Authentication server via get_Access_Token() function
 //
 //
 app.post('/token', function (req, res) {
@@ -46,7 +46,7 @@ app.post('/token', function (req, res) {
 //[Modify By Wasin W.]
 //
 // "/ERT_discovery" HTTP Get
-// handle "/ERT_discovery" HTTP Get from ERTRESTController.js. The function redirects getted data to EDP Service Discovery via get_service_discovery() function
+// handle "/ERT_discovery" HTTP Get from ERTRESTController.js. The function redirects getted data to RDP Service Discovery via get_service_discovery() function
 //
 //
 app.post('/streaming/pricing', function (req, res) {
@@ -57,13 +57,13 @@ app.post('/streaming/pricing', function (req, res) {
 //[Modify By Wasin W.]
 //
 // get_Access_Token(data, response)
-// Send HTTP Post request to EDP Authentication gateway, pass HTTP response data back to ERTRESTController.js.
+// Send HTTP Post request to RDP Authentication gateway, pass HTTP response data back to ERTRESTController.js.
 //
 //
 function get_Access_Token(data, res) {
     let authen_options = {
         method: 'POST',
-        uri: edp_gateway_token_url,
+        uri: rdp_gateway_token_url,
         form: data,
         headers: {
             'Accept': 'application/json',
@@ -73,7 +73,7 @@ function get_Access_Token(data, res) {
         json: true,
         resolveWithFullResponse: true,
         auth: {
-            username: data.username,
+            username: data.client_id,
             password: ''
         },
         simple: true,
@@ -85,12 +85,12 @@ function get_Access_Token(data, res) {
             //console.log('response.statusCode =' + response.statusCode);
             //console.log(`response = ${JSON.stringify(response)}`);
             if (response.statusCode == 200) {
-                console.log('EDP-GW Authentication succeeded. RECEIVED:')
+                console.log('RDP-GW Authentication succeeded. RECEIVED:')
                 res.send(response.body);
             }
         })
         .catch(function (error) {
-            console.log(`EDP-GW authentication result failure: ${error} statusCode =${error.statusCode}`);
+            console.log(`RDP-GW authentication result failure: ${error} statusCode =${error.statusCode}`);
             //res.send(error);
             res.status(error.statusCode).send(error);
         });
@@ -99,7 +99,7 @@ function get_Access_Token(data, res) {
 //[Modify By Wasin W.]
 //
 // get_service_discovery(data, response)
-// Send HTTP Post request to EDP Service Discovery gateway, pass HTTP response data back to ERTRESTController.js.
+// Send HTTP Post request to RDP Service Discovery gateway, pass HTTP response data back to ERTRESTController.js.
 //
 //
 function get_service_discovery(payload, res) {
